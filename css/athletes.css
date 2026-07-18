@@ -1,0 +1,303 @@
+/* ========================================
+   奥运传奇人物 - 时间线板块样式
+   嵌入数据新闻"人才密码"之后、"总结升华"之前
+   ======================================== */
+
+/* ==================== 传奇永续 ==================== */
+.athletes-final-section {
+  padding: 5rem 2rem 2rem;
+  position: relative;
+  text-align: center;
+}
+
+.athletes-final-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.athletes-final-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  background: linear-gradient(90deg, #ffffff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.athletes-final-divider {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+  margin: 0 auto 1.8rem;
+  border-radius: 2px;
+}
+
+.athletes-final-text {
+  font-size: 1.1rem;
+  line-height: 2.4;
+  color: rgba(255,255,255,0.85);
+}
+
+.athletes-final-text .highlight {
+  color: #ffd700;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.athletes-final-text + .athletes-final-text {
+  margin-top: 1.4rem;
+}
+
+.athletes-final-highlight {
+  color: #ffd700 !important;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-top: 2.2rem !important;
+  letter-spacing: 0.05em;
+}
+
+/* ==================== 运动员展示主体 ==================== */
+.athletes-section {
+  position: relative;
+  padding: 4rem 0;
+  z-index: 1;
+}
+
+.athletes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+}
+
+/* 中轴线 */
+.athletes-container::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom,
+    #c41e3a 0%,
+    #1e90ff 50%,
+    #2e8b57 100%);
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+/* ==================== 运动员项（左右并排）==================== */
+.athlete-item {
+  position: relative;
+  margin-bottom: 5rem;
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* 滚动触发：每个运动员独立出现 */
+.athlete-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 年份标记 */
+.athlete-year-marker {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  top: -1.2rem;
+}
+
+.athlete-year-marker .year {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #00d4ff;
+  background: rgba(0,188,212,0.15);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* 内容容器 - 左右并排 */
+.athlete-content {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* 默认：左卡片 + 右照片 */
+.athlete-item:not(.reverse) .athlete-content {
+  flex-direction: row;
+}
+
+/* 反向：左照片 + 右卡片 */
+.athlete-item.reverse .athlete-content {
+  flex-direction: row-reverse;
+}
+
+/* ==================== 成就卡片（左或右）==================== */
+.athlete-card {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(196,30,58,0.1) 0%, rgba(30,144,255,0.06) 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 1.8rem 2rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  min-width: 0;
+}
+
+.athlete-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(196,30,58,0.2);
+  border-color: rgba(255,215,0,0.3);
+}
+
+.athlete-sport-tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: #00d4ff;
+  background: rgba(0,188,212,0.1);
+  padding: 0.2rem 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.athlete-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.3rem;
+}
+
+.athlete-title {
+  font-size: 1rem;
+  color: #ffd700;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.athlete-desc {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.9;
+  margin-bottom: 1rem;
+}
+
+.athlete-quote {
+  font-size: 0.95rem;
+  color: rgba(255,215,0,0.8);
+  font-style: italic;
+  line-height: 1.8;
+  padding: 0.6rem 1rem;
+  border-left: 3px solid rgba(255,215,0,0.4);
+  margin-bottom: 1rem;
+  background: rgba(255,215,0,0.04);
+  border-radius: 0 8px 8px 0;
+}
+
+/* 成就数据 */
+.athlete-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.athlete-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.athlete-stats .num {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.athlete-stats .label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ==================== 运动员照片（右或左）==================== */
+.athlete-photo {
+  flex: 1;
+  max-width: 380px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #c41e3a, #9c27b0);
+  position: relative;
+}
+
+.athlete-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.athlete-photo:hover img {
+  transform: scale(1.05);
+}
+
+.photo-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.8rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 1024px) {
+  .athlete-content {
+    gap: 1.5rem;
+  }
+  
+  .athlete-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 手机端改为上下堆叠 */
+  .athlete-content {
+    flex-direction: column !important;
+    gap: 1.5rem;
+  }
+  
+  .athlete-item:not(.reverse) .athlete-content,
+  .athlete-item.reverse .athlete-content {
+    flex-direction: column !important;
+  }
+  
+  .athlete-card {
+    width: 100%;
+  }
+  
+  .athlete-photo {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .athlete-name { font-size: 1.5rem; }
+  
+  .athlete-stats {
+    gap: 1rem;
+  }
+  
+  .athlete-stats .num { font-size: 1.1rem; }
+}
