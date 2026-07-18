@@ -1134,6 +1134,39 @@ document.addEventListener('wheel', function(e) {
   setTimeout(() => isScrolling = false, 800);
 }, { passive: false });
 
+// ==================== 手机触摸滑动支持 ====================
+let touchStartY = 0;
+document.addEventListener('touchstart', function(e) {
+  if (!isHorizontalMode) return;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e) {
+  if (!isHorizontalMode) return;
+  if (isScrolling) return;
+  const deltaY = touchStartY - e.changedTouches[0].clientY;
+  if (Math.abs(deltaY) < 50) return; // 滑动距离太小，忽略
+
+  if (deltaY > 0 && currentPage < totalPages - 1) {
+    // 向上滑动（内容向下）
+    currentPage++;
+    goToPage(currentPage);
+  } else if (deltaY < 0 && currentPage > 0) {
+    // 向下滑动（内容向上）
+    currentPage--;
+    goToPage(currentPage);
+  } else if (deltaY > 0 && currentPage === totalPages - 1) {
+    // 最后一张向上滑 → 进入正文
+    enterMainContent();
+    isScrolling = true;
+    setTimeout(() => isScrolling = false, 1200);
+    return;
+  }
+
+  isScrolling = true;
+  setTimeout(() => isScrolling = false, 800);
+}, { passive: true });
+
 document.addEventListener('keydown', function(e) {
   if (!isHorizontalMode) return;
 
