@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夏季奥运会金牌竞速图 | 四十载逐梦盛夏</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #0c0e1a 0%, #1a1a2e 40%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+        .chart-container {
+            width: 880px;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 28px 28px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .header::after {
+            content: '';
+            display: block;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #EE1C25, transparent);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #f0f0f8;
+            letter-spacing: 2px;
+        }
+        .title .cn-red {
+            color: #EE1C25;
+        }
+        .subtitle-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin: 12px 0 14px;
+            flex-wrap: wrap;
+        }
+        .year-badge {
+            font-size: 38px;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #EE1C25, #c0392b);
+            padding: 2px 22px;
+            border-radius: 8px;
+            letter-spacing: 2px;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(238, 28, 37, 0.35);
+            transition: all 0.3s ease;
+        }
+        .info-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin: 16px 0 10px;
+        }
+        .btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 7px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.25s ease;
+            letter-spacing: 1px;
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #EE1C25, #c0392b);
+            border-color: #EE1C25;
+            color: #fff;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ff2a33, #e74c3c);
+            border-color: #ff2a33;
+            box-shadow: 0 4px 20px rgba(238, 28, 37, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        .speed-control select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .speed-control select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        #main {
+            width: 100%;
+            height: 520px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            margin: 6px 0 2px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 12px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .legend-dot.cn { width: 12px; height: 12px; box-shadow: 0 0 8px rgba(238,28,37,0.6); }
+        .highlight-text {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 12px;
+            text-align: center;
+            margin-top: 4px;
+        }
+        .caption-text {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: center;
+            margin: 16px 20px 8px;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid rgba(238, 28, 37, 0.5);
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 600px) {
+            .chart-container { padding: 16px 12px; }
+            .title { font-size: 18px; }
+            .year-badge { font-size: 28px; min-width: 70px; padding: 0 14px; }
+            #main { height: 400px; }
+            .controls { flex-wrap: wrap; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <div class="header">
+        <div class="title">四十载<span class="cn-red">逐梦盛夏</span></div>
+        <div class="subtitle-row">
+            <span class="year-badge" id="yearDisplay">1984</span>
+            <span class="info-text" id="eventDisplay">洛杉矶奥运会</span>
+        </div>
+    </div>
+
+    <div class="legend-row">
+        <div class="legend-item"><span class="legend-dot cn" style="background:#EE1C25;"></span>中国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#1f77b4;"></span>美国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#2ca02c;"></span>日本</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#9467bd;"></span>英国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ff7f0e;"></span>德国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ffffff;border:1px solid rgba(255,255,255,0.3);"></span>法国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#8c564b;"></span>意大利</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#17becf;"></span>澳大利亚</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#7f7f7f;"></span>韩国</div>
+    </div>
+
+    <div id="main"></div>
+
+    <div class="controls">
+        <button class="btn" id="btnPrev">◀ 上一届</button>
+        <button class="btn btn-primary" id="btnPlay">▶ 自动播放</button>
+        <button class="btn" id="btnNext">下一届 ▶</button>
+        <div class="speed-control">
+            速度
+            <select id="speedSelect">
+                <option value="3000">慢</option>
+                <option value="1800" selected>中</option>
+                <option value="900">快</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="highlight-text">⬆ 每次更新展示该届奥运会各国金牌数，排名实时动态排序</div>
+    <div class="caption-text">1984年洛杉矶奥运会，许海峰射落中国奥运史上首枚金牌，正式开启我国夏季奥运逐梦之路。此后数十载，参赛项目不断拓展，赛场奖牌收获逐年稳步增长，一代代运动员持续刷新赛场成绩，书写夏季竞技体育稳步向上的发展历程。</div>
+    <div class="footer">数据来源：国际奥委会官方统计 </div>
+</div>
+
+<script>
+(function() {
+    const chartDom = document.getElementById('main');
+    const myChart = echarts.init(chartDom, 'dark');
+    const yearDisplay = document.getElementById('yearDisplay');
+    const eventDisplay = document.getElementById('eventDisplay');
+
+    // ============================================================
+    // 历届夏季奥运会金牌数据（各国在该届获得的金牌数）
+    // ============================================================
+    const dataByYear = {
+        '1984': {
+            event: '洛杉矶奥运会',
+            host: '美国',
+            ranks: [
+                ['美国', 83],
+                ['中国', 15],
+                ['意大利', 14],
+                ['日本', 10],
+                ['英国', 5],
+                ['法国', 5],
+                ['澳大利亚', 4]
+            ]
+        },
+        '1988': {
+            event: '汉城奥运会',
+            host: '韩国',
+            ranks: [
+                ['美国', 36],
+                ['韩国', 12],
+                ['中国', 5],
+                ['法国', 6],
+                ['意大利', 6],
+                ['英国', 5],
+                ['日本', 4],
+                ['澳大利亚', 3]
+            ]
+        },
+        '1992': {
+            event: '巴塞罗那奥运会',
+            host: '西班牙',
+            ranks: [
+                ['美国', 37],
+                ['中国', 16],
+                ['韩国', 12],
+                ['法国', 8],
+                ['意大利', 6],
+                ['英国', 5],
+                ['澳大利亚', 7],
+                ['日本', 3]
+            ]
+        },
+        '1996': {
+            event: '亚特兰大奥运会',
+            host: '美国',
+            ranks: [
+                ['美国', 44],
+                ['中国', 16],
+                ['法国', 15],
+                ['意大利', 13],
+                ['澳大利亚', 9],
+                ['韩国', 7],
+                ['日本', 3],
+                ['英国', 1]
+            ]
+        },
+        '2000': {
+            event: '悉尼奥运会',
+            host: '澳大利亚',
+            ranks: [
+                ['美国', 37],
+                ['中国', 28],
+                ['澳大利亚', 16],
+                ['意大利', 13],
+                ['法国', 13],
+                ['英国', 11],
+                ['韩国', 8],
+                ['日本', 5]
+            ]
+        },
+        '2004': {
+            event: '雅典奥运会',
+            host: '希腊',
+            ranks: [
+                ['美国', 36],
+                ['中国', 32],
+                ['澳大利亚', 17],
+                ['日本', 16],
+                ['意大利', 10],
+                ['法国', 11],
+                ['韩国', 9],
+                ['英国', 9]
+            ]
+        },
+        '2008': {
+            event: '北京奥运会',
+            host: '中国',
+            ranks: [
+                ['中国', 48],
+                ['美国', 36],
+                ['英国', 19],
+                ['德国', 16],
+                ['澳大利亚', 14],
+                ['韩国', 13],
+                ['日本', 9],
+                ['意大利', 8],
+                ['法国', 7]
+            ]
+        },
+        '2012': {
+            event: '伦敦奥运会',
+            host: '英国',
+            ranks: [
+                ['美国', 46],
+                ['中国', 38],
+                ['英国', 29],
+                ['韩国', 13],
+                ['德国', 11],
+                ['法国', 11],
+                ['意大利', 8],
+                ['日本', 7],
+                ['澳大利亚', 7]
+            ]
+        },
+        '2016': {
+            event: '里约奥运会',
+            host: '巴西',
+            ranks: [
+                ['美国', 46],
+                ['英国', 27],
+                ['中国', 26],
+                ['德国', 17],
+                ['日本', 12],
+                ['法国', 10],
+                ['韩国', 9],
+                ['意大利', 8],
+                ['澳大利亚', 8]
+            ]
+        },
+        '2020': {
+            event: '东京奥运会',
+            host: '日本',
+            ranks: [
+                ['美国', 39],
+                ['中国', 38],
+                ['日本', 27],
+                ['英国', 22],
+                ['澳大利亚', 17],
+                ['德国', 10],
+                ['法国', 10],
+                ['意大利', 10],
+                ['韩国', 6]
+            ]
+        },
+        '2024': {
+            event: '巴黎奥运会',
+            host: '法国',
+            ranks: [
+                ['美国', 40],
+                ['中国', 40],
+                ['日本', 20],
+                ['澳大利亚', 18],
+                ['法国', 16],
+                ['英国', 14],
+                ['韩国', 13],
+                ['德国', 12],
+                ['意大利', 12]
+            ]
+        }
+    };
+
+    const years = Object.keys(dataByYear);
+    let currentIdx = 0;
+    let timer = null;
+    let isPlaying = false;
+    const btnPlay = document.getElementById('btnPlay');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const speedSelect = document.getElementById('speedSelect');
+
+    // 国家颜色映射（中国红突出）
+    const colorMap = {
+        '中国': '#EE1C25',
+        '美国': '#1f77b4',
+        '日本': '#2ca02c',
+        '英国': '#9467bd',
+        '德国': '#ff7f0e',
+        '法国': '#ffffff',
+        '意大利': '#8c564b',
+        '澳大利亚': '#17becf',
+        '韩国': '#7f7f7f'
+    };
+
+    // 中国名次里程碑标注
+    const milestones = {
+        '1984': '重返奥运',
+        '1988': '短暂低谷',
+        '1992': '重回前列',
+        '2000': '跻身三甲',
+        '2004': '坐二望一',
+        '2008': '登顶榜首 🏆',
+        '2012': '稳居次席',
+        '2016': '调整之年',
+        '2020': '紧追不舍',
+        '2024': '并驾齐驱'
+    };
+
+    // 图表初始配置
+    const option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                return '<span style="font-weight:bold;font-size:14px;">' + params.name + '</span><br/>' +
+                       '金牌：<span style="color:#f0c040;font-weight:bold;font-size:16px;">' + params.value + '</span> 枚';
+            },
+            backgroundColor: 'rgba(20,20,40,0.85)',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            textStyle: { color: '#e0e0e8', fontSize: 13 }
+        },
+        grid: {
+            left: 90,
+            right: 70,
+            top: 10,
+            bottom: 10
+        },
+        xAxis: {
+            max: 'dataMax',
+            splitLine: { show: false },
+            axisLine: { show: true, lineStyle: { color: 'rgba(255,255,255,0.08)' } },
+            axisLabel: {
+                color: 'rgba(255,255,255,0.4)',
+                fontSize: 11,
+                formatter: function(n) { return Math.round(n) + ''; }
+            }
+        },
+        yAxis: {
+            type: 'category',
+            inverse: true,
+            max: 8,
+            animationDuration: 300,
+            animationDurationUpdate: 300,
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: {
+                show: false
+            }
+        },
+        series: [{
+            realtimeSort: true,
+            seriesLayoutBy: 'column',
+            name: '金牌数',
+            type: 'bar',
+            data: [],
+            barMaxWidth: 38,
+            label: {
+                show: true,
+                position: 'right',
+                valueAnimation: true,
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: '#f0f0f8'
+            },
+            itemStyle: {
+                color: function(param) {
+                    return colorMap[param.name] || '#666';
+                },
+                borderRadius: [0, 4, 4, 0]
+            }
+        }],
+        animationDuration: 0,
+        animationDurationUpdate: 2000,
+        animationEasing: 'linear',
+        animationEasingUpdate: 'linear'
+    };
+
+    myChart.setOption(option);
+
+    // 更新图表到指定年份
+    function updateToYear(year) {
+        const data = dataByYear[year].ranks;
+        const event = dataByYear[year].event;
+        const host = dataByYear[year].host;
+
+        yearDisplay.textContent = year;
+        eventDisplay.textContent = event + '（' + host + '）';
+
+        // 构造 echarts 数据
+        const seriesData = data.map(function(item) {
+            return { name: item[0], value: item[1] };
+        });
+
+        myChart.setOption({
+            series: [{ data: seriesData }]
+        });
+    }
+
+    // 前进到下一届
+    function goNext() {
+        if (currentIdx < years.length - 1) {
+            currentIdx++;
+            updateToYear(years[currentIdx]);
+            return true;
+        }
+        return false;
+    }
+
+    // 后退到上一届
+    function goPrev() {
+        if (currentIdx > 0) {
+            currentIdx--;
+            updateToYear(years[currentIdx]);
+            return true;
+        }
+        return false;
+    }
+
+    // 自动播放切换
+    function togglePlay() {
+        if (isPlaying) {
+            stopPlay();
+        } else {
+            startPlay();
+        }
+    }
+
+    function startPlay() {
+        if (currentIdx >= years.length - 1) {
+            currentIdx = 0;
+            updateToYear(years[currentIdx]);
+        }
+        isPlaying = true;
+        btnPlay.textContent = '⏸ 暂停';
+        btnPlay.classList.add('playing');
+        btnPrev.disabled = true;
+        btnNext.disabled = true;
+        btnPrev.style.opacity = '0.4';
+        btnNext.style.opacity = '0.4';
+
+        const speed = parseInt(speedSelect.value);
+        timer = setInterval(function() {
+            const hasNext = goNext();
+            if (!hasNext) {
+                stopPlay();
+                // 播放结束后重置到开头
+                setTimeout(function() {
+                    currentIdx = 0;
+                    updateToYear(years[currentIdx]);
+                }, 800);
+            }
+        }, speed);
+    }
+
+    function stopPlay() {
+        isPlaying = false;
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+        btnPlay.textContent = '▶ 自动播放';
+        btnPlay.classList.remove('playing');
+        btnPrev.disabled = false;
+        btnNext.disabled = false;
+        btnPrev.style.opacity = '1';
+        btnNext.style.opacity = '1';
+    }
+
+    // 按钮事件
+    btnPlay.addEventListener('click', togglePlay);
+    btnPrev.addEventListener('click', function() {
+        if (!isPlaying) {
+            goPrev();
+            // 如果到了开头再点就跳到最后
+            if (currentIdx === 0) {
+                currentIdx = years.length - 1;
+                updateToYear(years[currentIdx]);
+            }
+        }
+    });
+    btnNext.addEventListener('click', function() {
+        if (!isPlaying) {
+            if (!goNext() && currentIdx >= years.length - 1) {
+                currentIdx = 0;
+                updateToYear(years[currentIdx]);
+            }
+        }
+    });
+
+    // 速度切换时如果是播放中，重置定时器
+    speedSelect.addEventListener('change', function() {
+        if (isPlaying) {
+            clearInterval(timer);
+            const speed = parseInt(speedSelect.value);
+            timer = setInterval(function() {
+                const hasNext = goNext();
+                if (!hasNext) {
+                    stopPlay();
+                    setTimeout(function() {
+                        currentIdx = 0;
+                        updateToYear(years[currentIdx]);
+                    }, 800);
+                }
+            }, speed);
+        }
+    });
+
+    // 键盘快捷键
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!isPlaying) {
+                if (!goNext() && currentIdx >= years.length - 1) {
+                    currentIdx = 0;
+                    updateToYear(years[currentIdx]);
+                }
+            }
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!isPlaying) goPrev();
+        } else if (e.key === ' ') {
+            e.preventDefault();
+            togglePlay();
+        }
+    });
+
+    // 响应式
+    window.addEventListener('resize', function() {
+        myChart.resize();
+    });
+
+    // 初始渲染
+    updateToYear(years[0]);
+
+    // 页面加载动画：延迟1秒自动播放
+    setTimeout(function() {
+        startPlay();
+    }, 1200);
+
+})();
+</script>
+</body>
+</html>
