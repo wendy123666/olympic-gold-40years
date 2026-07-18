@@ -382,6 +382,11 @@ body {
   overflow-x: hidden;
 }
 
+body.at-hero {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 /* 滚动条美化 */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
