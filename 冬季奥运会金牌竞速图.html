@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冬季奥运会金牌竞速图 | 三十载冰雪征程</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #0d1b2a 40%, #1b2838 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+        .chart-container {
+            width: 900px;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 16px;
+            padding: 28px 28px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+        .header { text-align: center; margin-bottom: 6px; position: relative; }
+        .header::after {
+            content: '';
+            display: block;
+            width: 140px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #039be5, transparent);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #e8f4fd;
+            letter-spacing: 2px;
+        }
+        .title .cn-blue { color: #039be5; }
+        .title .cn-red { color: #EE1C25; }
+        .subtitle-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin: 12px 0 14px;
+            flex-wrap: wrap;
+        }
+        .year-badge {
+            font-size: 38px;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #039be5, #0277bd);
+            padding: 2px 22px;
+            border-radius: 8px;
+            letter-spacing: 2px;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(3, 155, 229, 0.4);
+            transition: all 0.3s ease;
+        }
+        .info-text {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        .milestone-tag {
+            display: inline-block;
+            background: rgba(238, 28, 37, 0.15);
+            border: 1px solid rgba(238, 28, 37, 0.3);
+            color: #ff6b6b;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin: 16px 0 10px;
+        }
+        .btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 7px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.25s ease;
+            letter-spacing: 1px;
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #039be5, #0277bd);
+            border-color: #039be5;
+            color: #fff;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #29b6f6, #039be5);
+            border-color: #29b6f6;
+            box-shadow: 0 4px 20px rgba(3, 155, 229, 0.4);
+        }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 12px;
+        }
+        .speed-control select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .speed-control select option { background: #0d1b2a; color: #fff; }
+        #main { width: 100%; height: 520px; }
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.18);
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            margin: 6px 0 2px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .legend-dot.cn { width: 11px; height: 11px; box-shadow: 0 0 8px rgba(238,28,37,0.5); }
+        .highlight-text {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            text-align: center;
+            margin-top: 4px;
+        }
+        .caption-text {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: center;
+            margin: 16px 20px 8px;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid rgba(3, 155, 229, 0.5);
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 600px) {
+            .chart-container { padding: 14px 10px; }
+            .title { font-size: 17px; }
+            .year-badge { font-size: 26px; min-width: 65px; padding: 0 12px; }
+            #main { height: 400px; }
+            .controls { flex-wrap: wrap; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <div class="header">
+        <div class="title">三十载<span class="cn-red">冰雪征程</span></div>
+        <div class="subtitle-row">
+            <span class="year-badge" id="yearDisplay">1994</span>
+            <span class="info-text" id="eventDisplay">利勒哈默尔冬奥会</span>
+            <span class="milestone-tag" id="milestoneTag"></span>
+        </div>
+    </div>
+
+    <div class="legend-row">
+        <div class="legend-item"><span class="legend-dot cn" style="background:#EE1C25;"></span>中国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#1f77b4;"></span>挪威</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#2ca02c;"></span>德国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#9467bd;"></span>加拿大</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ff7f0e;"></span>美国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#17becf;"></span>荷兰</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ffffff;border:1px solid rgba(255,255,255,0.3);"></span>法国</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#8c564b;"></span>瑞士</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#bcbd22;"></span>瑞典</div>
+    </div>
+
+    <div id="main"></div>
+
+    <div class="controls">
+        <button class="btn" id="btnPrev">◀ 上一届</button>
+        <button class="btn btn-primary" id="btnPlay">▶ 自动播放</button>
+        <button class="btn" id="btnNext">下一届 ▶</button>
+        <div class="speed-control">
+            速度
+            <select id="speedSelect">
+                <option value="3000">慢</option>
+                <option value="1800" selected>中</option>
+                <option value="900">快</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="highlight-text">⬆ 每次更新展示该届冬奥会各国金牌数，动画展现"从零突破"的跨越之路</div>
+    <div class="caption-text">1994年利勒哈默尔冬奥会，中国冰雪项目尚未收获奖牌。经过长期项目培育与人才积淀，后续各届赛事奖牌数量持续突破，冰雪运动从空白起步到多点夺牌，完整记录我国冰雪竞技从无到有、由弱至强的成长之路。</div>
+    <div class="footer">数据来源：国际奥委会官方统计 </div>
+</div>
+
+<script>
+(function() {
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom, 'dark');
+    var yearDisplay = document.getElementById('yearDisplay');
+    var eventDisplay = document.getElementById('eventDisplay');
+    var milestoneTag = document.getElementById('milestoneTag');
+
+    // ============================================================
+    // 历届冬季奥运会金牌数据（各国在该届获得的金牌数）
+    // 中国首金：2002年盐湖城冬奥会（杨扬，短道速滑女子500米）
+    // ============================================================
+    var dataByYear = {
+        '1994': {
+            event: '利勒哈默尔冬奥会',
+            host: '挪威',
+            chinaGold: 0,
+            ranks: [
+                ['挪威', 10],
+                ['德国', 9],
+                ['俄罗斯', 6],
+                ['意大利', 4],
+                ['美国', 6],
+                ['加拿大', 3],
+                ['瑞士', 3],
+                ['荷兰', 4],
+                ['法国', 5]
+            ]
+        },
+        '1998': {
+            event: '长野冬奥会',
+            host: '日本',
+            chinaGold: 0,
+            ranks: [
+                ['德国', 12],
+                ['挪威', 10],
+                ['俄罗斯', 9],
+                ['加拿大', 6],
+                ['美国', 6],
+                ['荷兰', 5],
+                ['日本', 5],
+                ['瑞士', 4],
+                ['法国', 2]
+            ]
+        },
+        '2002': {
+            event: '盐湖城冬奥会',
+            host: '美国',
+            chinaGold: 2,
+            ranks: [
+                ['挪威', 13],
+                ['德国', 12],
+                ['美国', 10],
+                ['加拿大', 7],
+                ['俄罗斯', 5],
+                ['法国', 4],
+                ['意大利', 4],
+                ['瑞士', 3],
+                ['中国', 2]
+            ]
+        },
+        '2006': {
+            event: '都灵冬奥会',
+            host: '意大利',
+            chinaGold: 2,
+            ranks: [
+                ['德国', 11],
+                ['美国', 9],
+                ['奥地利', 9],
+                ['俄罗斯', 8],
+                ['加拿大', 7],
+                ['瑞典', 7],
+                ['韩国', 6],
+                ['瑞士', 5],
+                ['中国', 2]
+            ]
+        },
+        '2010': {
+            event: '温哥华冬奥会',
+            host: '加拿大',
+            chinaGold: 5,
+            ranks: [
+                ['加拿大', 14],
+                ['德国', 10],
+                ['美国', 9],
+                ['挪威', 9],
+                ['韩国', 6],
+                ['瑞士', 6],
+                ['中国', 5],
+                ['瑞典', 5],
+                ['法国', 2]
+            ]
+        },
+        '2014': {
+            event: '索契冬奥会',
+            host: '俄罗斯',
+            chinaGold: 3,
+            ranks: [
+                ['俄罗斯', 13],
+                ['挪威', 11],
+                ['加拿大', 10],
+                ['美国', 9],
+                ['荷兰', 8],
+                ['德国', 8],
+                ['瑞士', 6],
+                ['白俄罗斯', 5],
+                ['中国', 3]
+            ]
+        },
+        '2018': {
+            event: '平昌冬奥会',
+            host: '韩国',
+            chinaGold: 1,
+            ranks: [
+                ['挪威', 14],
+                ['德国', 14],
+                ['加拿大', 11],
+                ['美国', 9],
+                ['荷兰', 8],
+                ['瑞典', 7],
+                ['韩国', 5],
+                ['瑞士', 3],
+                ['中国', 1]
+            ]
+        },
+        '2022': {
+            event: '北京冬奥会',
+            host: '中国',
+            chinaGold: 9,
+            ranks: [
+                ['挪威', 16],
+                ['德国', 12],
+                ['中国', 9],
+                ['美国', 9],
+                ['瑞典', 8],
+                ['荷兰', 8],
+                ['奥地利', 7],
+                ['瑞士', 7],
+                ['加拿大', 4]
+            ]
+        },
+        '2026': {
+            event: '米兰-科尔蒂纳冬奥会',
+            host: '意大利',
+            chinaGold: 5,
+            ranks: [
+                ['挪威', 18],
+                ['美国', 12],
+                ['荷兰', 10],
+                ['意大利', 10],
+                ['德国', 8],
+                ['法国', 8],
+                ['瑞典', 8],
+                ['瑞士', 6],
+                ['中国', 5]
+            ]
+        }
+    };
+
+    var years = Object.keys(dataByYear);
+    var currentIdx = 0;
+    var timer = null;
+    var isPlaying = false;
+
+    var btnPlay = document.getElementById('btnPlay');
+    var btnPrev = document.getElementById('btnPrev');
+    var btnNext = document.getElementById('btnNext');
+    var speedSelect = document.getElementById('speedSelect');
+
+    // 国家颜色映射
+    var colorMap = {
+        '中国':   '#EE1C25',
+        '挪威':   '#1f77b4',
+        '德国':   '#2ca02c',
+        '加拿大': '#9467bd',
+        '美国':   '#ff7f0e',
+        '荷兰':   '#17becf',
+        '法国':   '#ffffff',
+        '瑞士':   '#8c564b',
+        '瑞典':   '#bcbd22',
+        '俄罗斯': '#e377c2',
+        '奥地利': '#7f7f7f',
+        '韩国':   '#aec7e8',
+        '意大利': '#ffbb78',
+        '日本':   '#98df8a',
+        '白俄罗斯': '#c5b0d5'
+    };
+
+    // 中国里程碑标注
+    var milestones = {
+        '1994': '尚未奖牌零突破',
+        '1998': '6银2铜，金牌零的突破在望',
+        '2002': '🏆 杨扬夺首金！历史突破',
+        '2006': '韩晓鹏雪上首金',
+        '2010': '温哥华5金，最佳境外战绩',
+        '2014': '索契3金，稳扎稳打',
+        '2018': '平昌1金，武大靖短道夺冠',
+        '2022': '🏆 北京9金！主场大爆发',
+        '2026': '米兰5金！冰雪实力稳居第二梯队'
+    };
+
+    // ECharts 配置
+    var option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                var tag = '';
+                if (params.name === '中国') {
+                    var y = years[currentIdx];
+                    var g = dataByYear[y].chinaGold;
+                    tag = g === 0 ? '（本届未获金牌）' : '（本届金牌：' + g + ' 枚）';
+                }
+                return '<span style="font-weight:bold;font-size:14px;">' + params.name + '</span> ' + tag + '<br/>' +
+                       '金牌：<span style="color:#40c4ff;font-weight:bold;font-size:16px;">' + params.value + '</span> 枚';
+            },
+            backgroundColor: 'rgba(10,20,40,0.9)',
+            borderColor: 'rgba(100,180,255,0.2)',
+            borderWidth: 1,
+            textStyle: { color: '#e0e0e8', fontSize: 13 }
+        },
+        grid: { left: 90, right: 70, top: 10, bottom: 10 },
+        xAxis: {
+            max: 'dataMax',
+            splitLine: { show: false },
+            axisLine: { show: true, lineStyle: { color: 'rgba(255,255,255,0.06)' } },
+            axisLabel: {
+                color: 'rgba(255,255,255,0.35)',
+                fontSize: 11,
+                formatter: function(n) { return Math.round(n) + ''; }
+            }
+        },
+        yAxis: {
+            type: 'category',
+            inverse: true,
+            max: 8,
+            animationDuration: 300,
+            animationDurationUpdate: 300,
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: {
+                show: false
+            }
+        },
+        series: [{
+            realtimeSort: true,
+            name: '金牌',
+            type: 'bar',
+            data: [],
+            barMaxWidth: 40,
+            label: {
+                show: true,
+                position: 'right',
+                valueAnimation: true,
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: '#e8f4fd'
+            },
+            itemStyle: {
+                color: function(param) {
+                    return colorMap[param.name] || '#666';
+                },
+                borderRadius: [0, 5, 5, 0]
+            }
+        }],
+        animationDuration: 0,
+        animationDurationUpdate: 2200,
+        animationEasing: 'cubicOut',
+        animationEasingUpdate: 'cubicOut'
+    };
+
+    myChart.setOption(option);
+
+    // 更新到指定年份
+    function updateToYear(year) {
+        var data = dataByYear[year].ranks;
+        var event = dataByYear[year].event;
+        var host = dataByYear[year].host;
+        var chinaG = dataByYear[year].chinaGold;
+
+        yearDisplay.textContent = year;
+        eventDisplay.textContent = event + '（' + host + '）';
+
+        // 里程碑标注
+        if (milestones[year]) {
+            milestoneTag.textContent = milestones[year];
+            milestoneTag.style.display = '';
+        } else {
+            milestoneTag.style.display = 'none';
+        }
+
+        // 中国金数字体高亮
+        if (chinaG > 0) {
+            yearDisplay.style.background = 'linear-gradient(135deg, #EE1C25, #c0392b)';
+        } else {
+            yearDisplay.style.background = 'linear-gradient(135deg, #039be5, #0277bd)';
+        }
+
+        var seriesData = data.map(function(item) {
+            return { name: item[0], value: item[1] };
+        });
+
+        myChart.setOption({
+            series: [{ data: seriesData }]
+        });
+    }
+
+    function goNext() {
+        if (currentIdx < years.length - 1) {
+            currentIdx++;
+            updateToYear(years[currentIdx]);
+            return true;
+        }
+        return false;
+    }
+
+    function goPrev() {
+        if (currentIdx > 0) {
+            currentIdx--;
+            updateToYear(years[currentIdx]);
+            return true;
+        }
+        return false;
+    }
+
+    function startPlay() {
+        if (currentIdx >= years.length - 1) {
+            currentIdx = 0;
+            updateToYear(years[currentIdx]);
+        }
+        isPlaying = true;
+        btnPlay.textContent = '⏸ 暂停';
+        btnPrev.disabled = true;
+        btnNext.disabled = true;
+        btnPrev.style.opacity = '0.4';
+        btnNext.style.opacity = '0.4';
+
+        var speed = parseInt(speedSelect.value);
+        timer = setInterval(function() {
+            var hasNext = goNext();
+            if (!hasNext) {
+                stopPlay();
+                setTimeout(function() {
+                    currentIdx = 0;
+                    updateToYear(years[currentIdx]);
+                }, 1200);
+            }
+        }, speed + 600);
+    }
+
+    function stopPlay() {
+        isPlaying = false;
+        if (timer) { clearInterval(timer); timer = null; }
+        btnPlay.textContent = '▶ 自动播放';
+        btnPrev.disabled = false;
+        btnNext.disabled = false;
+        btnPrev.style.opacity = '1';
+        btnNext.style.opacity = '1';
+    }
+
+    btnPlay.addEventListener('click', function() {
+        if (isPlaying) stopPlay(); else startPlay();
+    });
+
+    btnPrev.addEventListener('click', function() {
+        if (!isPlaying) {
+            if (!goPrev()) { currentIdx = years.length - 1; updateToYear(years[currentIdx]); }
+        }
+    });
+
+    btnNext.addEventListener('click', function() {
+        if (!isPlaying) {
+            if (!goNext()) { currentIdx = 0; updateToYear(years[currentIdx]); }
+        }
+    });
+
+    speedSelect.addEventListener('change', function() {
+        if (isPlaying) {
+            stopPlay();
+            setTimeout(startPlay, 100);
+        }
+    });
+
+    // 键盘快捷键
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!isPlaying) {
+                if (!goNext()) { currentIdx = 0; updateToYear(years[currentIdx]); }
+            }
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!isPlaying) {
+                if (!goPrev()) { currentIdx = years.length - 1; updateToYear(years[currentIdx]); }
+            }
+        } else if (e.key === ' ') {
+            e.preventDefault();
+            if (isPlaying) stopPlay(); else startPlay();
+        }
+    });
+
+    window.addEventListener('resize', function() { myChart.resize(); });
+
+    // 初始渲染 + 1.5秒后自动播放
+    updateToYear(years[0]);
+    setTimeout(startPlay, 1500);
+
+})();
+</script>
+</body>
+</html>
